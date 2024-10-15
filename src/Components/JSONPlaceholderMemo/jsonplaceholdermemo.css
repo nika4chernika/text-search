@@ -1,0 +1,22 @@
+.wrapper {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+    padding-bottom: 60px;
+    padding-top: 60px;
+}
+
+.search-input {
+    width: 40%;
+    border: 1px solid black;
+    border-radius: 8px;
+    padding: 10px 20px;
+}
+
+.post {
+    width: 80%;
+    border: 1px solid black;
+    border-radius: 8px;
+    padding: 20px;
+}
