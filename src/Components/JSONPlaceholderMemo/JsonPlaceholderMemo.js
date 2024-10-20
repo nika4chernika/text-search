@@ -5,7 +5,6 @@ import "./jsonplaceholdermemo.css";
 const JsonPlaceholderMemo = () => {
   const [posts, setPosts] = useState([]);
   const [inputText, setInputText] = useState("");
-  const [searchInputText, setSearchInputText] = useState("");
 
   const createMarks = (str) => {
     const part = str.split("<mark>");
@@ -19,7 +18,7 @@ const JsonPlaceholderMemo = () => {
   };
 
   const filterPosts = useCallback(() => {
-    if (!searchInputText) return posts;
+    if (!inputText) return posts;
 
     // return posts.filter(
     //   (post) => post.title.includes(inputText) || post.body.includes(inputText)
@@ -27,12 +26,12 @@ const JsonPlaceholderMemo = () => {
 
     const newArr = [];
     for (let i = 0; i < posts.length; i++) {
-      if (posts[i].title.includes(searchInputText)) {
-        let startIndexFindWord = posts[i].title.indexOf(searchInputText);
+      if (posts[i].title.includes(inputText)) {
+        let startIndexFindWord = posts[i].title.indexOf(inputText);
         let newStr = posts[i].title.split("");
         newStr.splice(startIndexFindWord, 0, "<mark>");
         newStr.splice(
-          startIndexFindWord + searchInputText.length + 1,
+          startIndexFindWord + inputText.length + 1,
           0,
           "<mark>"
         );
@@ -41,12 +40,12 @@ const JsonPlaceholderMemo = () => {
         continue;
       }
 
-      if (posts[i].body.includes(searchInputText)) {
-        let startIndexFindWord = posts[i].body.indexOf(searchInputText);
+      if (posts[i].body.includes(inputText)) {
+        let startIndexFindWord = posts[i].body.indexOf(inputText);
         let newStr = posts[i].body.split("");
         newStr.splice(startIndexFindWord, 0, "<mark>");
         newStr.splice(
-          startIndexFindWord + searchInputText.length + 1,
+          startIndexFindWord + inputText.length + 1,
           0,
           "<mark>"
         );
@@ -55,7 +54,18 @@ const JsonPlaceholderMemo = () => {
       }
     }
     return newArr;
-  }, [posts, searchInputText]);
+  }, [posts, inputText]);
+
+const debounce = (fn, delay) => {
+    console.log(delay)
+    let timer 
+    return (...args) => {
+        if(timer) clearTimeout(timer)
+        timer = setTimeout(() => fn(...args), delay) 
+    }
+  } 
+
+  const handleChangeInputValue = useCallback(debounce((value) => setInputText(value), 1000), []) 
 
   useEffect(() => {
     const getPosts = async () => {
@@ -73,25 +83,18 @@ const JsonPlaceholderMemo = () => {
 
   const filteredPosts = useMemo(() => filterPosts(), [filterPosts]);
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      setSearchInputText(inputText);
-    }
-  };
+
 
   return (
     <div className="wrapper">
       <h1>Search posts</h1>
       <input
-        onChange={(e) => setInputText(e.target.value)}
-        onClick={() => setInputText("")}
-        onKeyDown={handleKeyDown}
-        value={inputText}
+        onChange={(e) => handleChangeInputValue(e.target.value)}
         className="search-input"
         placeholder="Search posts..."
       />
       {filteredPosts.map((post) => (
-        <div className="post">
+        <div key={post.id} className="post">
           <h2>{createMarks(post.title)}</h2>
           <p>{createMarks(post.body)}</p>
         </div>
